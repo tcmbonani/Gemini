@@ -107,3 +107,36 @@ function searchCMDBData() {
         alert('Please wait until the loading progress reaches 60% before downloading.');
     }
 }
+
+// Function to download file after checking progress bar
+function downloadFile(filePath) {
+    // Get the progress bar element for this row
+    var $loadingBar = $(event.target).closest('tr').find('.progress-bar');
+
+    // Check if loading progress is over 60% complete
+    if (getLoadingPercentage($loadingBar) > 60) {
+        // Proceed with the download
+        var anchor = document.createElement('a');
+        anchor.style.display = 'none';
+        anchor.href = filePath;
+        anchor.download = getFileNameFromPath(filePath);
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+    } else {
+        // Display an error message if the progress is below 60%
+        alert('Please wait until the loading progress reaches 60% before downloading.');
+    }
+}
+
+// Function to calculate loading percentage
+function getLoadingPercentage($loadingBar) {
+    var currentWidth = $loadingBar.width();
+    var totalWidth = $loadingBar.parent().width();
+    return (currentWidth / totalWidth) * 100;
+}
+
+// Function to get the filename from the file path
+function getFileNameFromPath(filePath) {
+    return filePath.split('/').pop(); // Extract the filename after the last '/'
+}
