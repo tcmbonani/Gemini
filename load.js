@@ -196,19 +196,33 @@ function createZip(selectedFiles) {
     // Initialize JSZip
     var zip = new JSZip();
 
-    // Iterate through selected files
-    selectedFiles.forEach(function(file) {
-        // Add each file to the zip
-        zip.file(file.name, file.path);
+    // Create a promise array to fetch and add each file to the zip
+    var promises = selectedFiles.map(function(file) {
+        return fetch(file.path)
+            .then(response => response.blob())
+            .then(blob => {
+                // Add fetched file to the zip
+                zip.file(file.name, blob);
+            })
+            .catch(error => {
+                console.error("Error fetching file:", error);
+                alert('Failed to fetch file. Please try again later.');
+            });
     });
 
-    // Generate the zip file asynchronously
-    zip.generateAsync({ type: "blob" })
-    .then(function(content) {
-        // Trigger download of the zip file
-        saveAs(content, "selected_files.zip");
-    });
+    // Wait for all promises to resolve
+    Promise.all(promises)
+        .then(() => {
+            // Generate the zip file asynchronously
+            zip.generateAsync({ type: "blob" })
+                .then(function(content) {
+                    // Trigger download of the zip file
+                    saveAs(content, "selected_files.zip");
+                });
+        });
 }
+
+
 
 // Function to get the filename from the file path
 function getFileNameFromPath(filePath) {
