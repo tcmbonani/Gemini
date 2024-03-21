@@ -108,6 +108,17 @@ function searchCMDBData() {
     }
 }
 
+
+// Event listener for the "Select All" checkbox
+$('#selectAllCheckbox').on('change', function() {
+    // Get all checkboxes in the table body
+    var $checkboxes = $('tbody input[type="checkbox"]');
+    
+    // Set the checked property of all checkboxes based on the state of the "Select All" checkbox
+    $checkboxes.prop('checked', this.checked);
+});
+
+
 // Function to download file after checking progress bar
 function downloadFile(filePath) {
     // Get the progress bar element for this row
@@ -139,4 +150,67 @@ function getLoadingPercentage($loadingBar) {
 // Function to get the filename from the file path
 function getFileNameFromPath(filePath) {
     return filePath.split('/').pop(); // Extract the filename after the last '/'
+}
+
+//Start
+
+// Function to get the filename from the file path
+function getFileNameFromPath(filePath) {
+    if (typeof filePath === 'string' && filePath.includes('/img/')) {
+        return filePath.split('/img/').pop(); // Extract the filename after the last '/img/'
+    } else {
+        // Handle cases where filePath is not a string or does not contain '/img/'
+        console.error("Invalid filePath:", filePath);
+        return ""; // Return an empty string or handle the error as per your requirement
+    }
+}
+
+// Function to collect file paths of checked files and initiate download
+function createAndDownloadZip() {
+    // Array to store file paths of checked files
+    var selectedFiles = [];
+
+    // Get all checkboxes in the table body
+    $('tbody input[type="checkbox"]:checked').each(function() {
+        // Get the file path associated with each checked checkbox
+        var filePath = $(this).closest('tr').find('.downloadButton').data('download-link');
+        if (filePath) { // Check if filePath is defined
+            selectedFiles.push({ path: filePath, name: getFileNameFromPath(filePath) });
+        } else {
+            console.error("filePath is undefined for checkbox:", this);
+        }
+    });
+
+    // Check if any file is selected
+    if (selectedFiles.length > 0) {
+        // Call a function to create a zip file containing all selected files
+        createZip(selectedFiles);
+    } else {
+        // Display an error message if no file is selected
+        alert('Please select at least one file to download.');
+    }
+}
+
+// Function to create a zip file containing all selected files
+function createZip(selectedFiles) {
+    // Initialize JSZip
+    var zip = new JSZip();
+
+    // Iterate through selected files
+    selectedFiles.forEach(function(file) {
+        // Add each file to the zip
+        zip.file(file.name, file.path);
+    });
+
+    // Generate the zip file asynchronously
+    zip.generateAsync({ type: "blob" })
+    .then(function(content) {
+        // Trigger download of the zip file
+        saveAs(content, "selected_files.zip");
+    });
+}
+
+// Function to get the filename from the file path
+function getFileNameFromPath(filePath) {
+    return filePath ? filePath.split('/').pop() : ''; // Extract the filename after the last '/', or return an empty string if filePath is undefined
 }
