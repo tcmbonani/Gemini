@@ -33,12 +33,12 @@ $(document).ready(function() {
     function updateResults($resultsColumn) {
         // Array of possible results
         var possibleResults = [
-            'Listed',
-            'Vulnerabilities found',
-            'No firewall',
-            'Cyber Ark Success',
-            'UAM rules correct',
-            'Valuation failed'
+            'Onboarded',
+            'Medium Vulnerabilities Found',
+            'Secure Rules',
+            'Onboarded',
+            'Onboarded',
+            'Third Party Assessment Passed'
             // Add more possible results as needed
         ];
         
@@ -96,7 +96,7 @@ function searchCMDBData() {
                 const resultBlob = new Blob([JSON.stringify(searchResults)], { type: 'application/json' });
                 const downloadLink = document.createElement('a');
                 downloadLink.href = URL.createObjectURL(resultBlob);
-                downloadLink.download = 'search_results.json';
+                downloadLink.download = `CMDB hostname:${hostname}.json`;
                 downloadLink.click();
             })
             .catch(error => {
